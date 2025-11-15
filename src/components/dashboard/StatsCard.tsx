@@ -3,14 +3,14 @@ import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 interface StatsCardProps {
   title: string;
-  value: string;
+  value: number;
   icon: React.ReactNode;
   change: number;
 }
 
 export default function StatsCard({ title, value, icon, change }: StatsCardProps) {
   const ChangeIcon = change >= 0 ? ArrowUpRight : ArrowDownRight;
-  const changeColor = change >= 0 ? "text-[hsl(var(--chart-2))]" : "text-destructive";
+  const changeColor = change >= 0 ? "text-[var(--chart-2)]" : "text-destructive";
 
   return (
     <Card>

@@ -77,3 +77,23 @@ export interface Event {
   status: EventStatus;
   media?: Media[];
 }
+
+export type StatItem = {
+  description: string;
+  id: string;
+  name: string;
+  period: string;
+  title: string;
+  values: Array<{
+    value: number;
+    end_time: string;
+  }>;
+};
+
+export interface Stats {
+  data: StatItem[];
+  paging?: {
+    previous?: string;
+    next?: string;
+  };
+}
