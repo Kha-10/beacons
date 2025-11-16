@@ -103,7 +103,7 @@ export default function DashboardPage() {
       setIsLoading(true);
       try {
         const { data } = await axios.get(
-          `https://graph.facebook.com/${process.env.NEXT_PUBLIC_PAGE_ID}/insights?metric=page_post_engagements,page_follows,page_impressions_unique&period=day&since=${startDate}&until=${endDate}&access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`
+          `https://graph.facebook.com/${process.env.NEXT_PUBLIC_PAGE_ID}/insights?metric=page_post_engagements,page_follows,page_impressions&period=days_28&access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`
         );
         setData(data);
         console.log("data", data);
@@ -119,6 +119,59 @@ export default function DashboardPage() {
 
     fetchInsights();
   }, [date]);
+
+  async function getPostInsights(postId: string) {
+    const metrics = [
+      "id",
+      "created_time",
+      "from",
+      "full_picture",
+      "permalink_url",
+      "is_hidden",
+      "properties",
+      "shares",
+      "attachments{description,media,media_type,title,type,unshimmed_url,url}",
+      "comments.summary(true).order(reverse_chronological){message,from,created_time,comment_count}",
+      "likes.summary(true)",
+    ].join(",");
+
+    const url = `https://graph.facebook.com/v24.0/${postId}?fields=${metrics}&access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`;
+    const { data } = await axios.get(url);
+    return data;
+  }
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setIsLoading(true);
+      try {
+        const { data } = await axios.get(
+          `https://graph.facebook.com/${process.env.NEXT_PUBLIC_PAGE_ID}/published_posts?access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`
+        );
+
+        const results = [];
+        console.log("posts", data);
+        for (const post of data.data) {
+          const insights = await getPostInsights(post.id);
+
+          results.push({
+            id: post.id,
+            created_time: post.created_time,
+            message: post.message || "",
+            insights: insights,
+          });
+          console.log("results", results);
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error("Error fetching Facebook posts:", error.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   return (
     <div className="flex flex-col w-full overflow-x-hidden">

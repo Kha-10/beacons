@@ -26,7 +26,7 @@ import { Skeleton } from "../ui/skeleton";
 const chartConfig = {
   followers: {
     label: "Followers",
-    color: "hsl(var(--chart-1))",
+    color: "var(--chart-1)",
   },
 } satisfies ChartConfig;
 
