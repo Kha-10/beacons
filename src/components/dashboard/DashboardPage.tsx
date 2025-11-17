@@ -103,7 +103,7 @@ export default function DashboardPage() {
       setIsLoading(true);
       try {
         const { data } = await axios.get(
-          `https://graph.facebook.com/${process.env.NEXT_PUBLIC_PAGE_ID}/insights?metric=page_post_engagements,page_follows,page_impressions&period=days_28&access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`
+          `https://graph.facebook.com/${process.env.NEXT_PUBLIC_PAGE_ID}/insights?metric=page_post_engagements,page_follows,page_impressions&period=month&access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`
         );
         setData(data);
         console.log("data", data);
@@ -144,12 +144,18 @@ export default function DashboardPage() {
     const fetchPosts = async () => {
       setIsLoading(true);
       try {
+        const startDate = date?.from
+          ? formatDate(startOfMonth(new Date()))
+          : "";
+        const endDate = date?.to ? formatDate(new Date()) : "";
         const { data } = await axios.get(
-          `https://graph.facebook.com/${process.env.NEXT_PUBLIC_PAGE_ID}/published_posts?access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`
+          `https://graph.facebook.com/${process.env.NEXT_PUBLIC_PAGE_ID}/published_posts? ?summary=total_count
+  &since=${startDate}
+  &until=${endDate}
+  &limit=1&access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`
         );
 
         const results = [];
-        console.log("posts", data);
         for (const post of data.data) {
           const insights = await getPostInsights(post.id);
 
@@ -172,6 +178,8 @@ export default function DashboardPage() {
 
     fetchPosts();
   }, []);
+
+  console.log("engagementData", engagementData);
 
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
