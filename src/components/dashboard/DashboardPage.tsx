@@ -56,37 +56,6 @@ export default function DashboardPage() {
     setFollowerData(filteredFollowers);
   }, [date]);
 
-  const stats = useMemo(() => {
-    if (!followerData.length && !engagementData.length && !reachData.length)
-      return null;
-
-    // In a real app, you'd calculate this more robustly
-    const latestFollowers =
-      followerData.length > 0
-        ? followerData[followerData.length - 1].followers
-        : 0;
-    const totalEngagement = engagementData.reduce(
-      (sum, item) => sum + item.likes + item.comments + item.shares,
-      0
-    );
-    const totalReach = reachData.reduce((sum, item) => sum + item.reach, 0);
-
-    return {
-      totalFollowers: {
-        value: latestFollowers.toLocaleString(),
-        change: Math.random() * 10 - 4,
-      },
-      totalEngagement: {
-        value: totalEngagement.toLocaleString(),
-        change: Math.random() * 20 - 10,
-      },
-      totalReach: {
-        value: totalReach.toLocaleString(),
-        change: Math.random() * 15 - 7,
-      },
-    };
-  }, [followerData, engagementData, reachData]);
-
   const formatDate = (date: Date) => {
     return date.toISOString().split("T")[0];
   };
@@ -102,11 +71,8 @@ export default function DashboardPage() {
       }
       setIsLoading(true);
       try {
-        const { data } = await axios.get(
-          `https://graph.facebook.com/${process.env.NEXT_PUBLIC_PAGE_ID}/insights?metric=page_post_engagements,page_follows,page_impressions&period=days_28&access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`
-        );
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}`);
         setData(data);
-        console.log("data", data);
       } catch (error: unknown) {
         if (error instanceof Error) {
           console.error("Error fetching Facebook insights:", error.message);
@@ -121,22 +87,9 @@ export default function DashboardPage() {
   }, [date]);
 
   async function getPostInsights(postId: string) {
-    const metrics = [
-      "id",
-      "created_time",
-      "from",
-      "full_picture",
-      "permalink_url",
-      "is_hidden",
-      "properties",
-      "shares",
-      "attachments{description,media,media_type,title,type,unshimmed_url,url}",
-      "comments.summary(true).order(reverse_chronological){message,from,created_time,comment_count}",
-      "likes.summary(true)",
-    ].join(",");
-
-    const url = `https://graph.facebook.com/v24.0/${postId}?fields=${metrics}&access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`;
-    const { data } = await axios.get(url);
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}`
+    );
     return data;
   }
 
@@ -145,11 +98,10 @@ export default function DashboardPage() {
       setIsLoading(true);
       try {
         const { data } = await axios.get(
-          `https://graph.facebook.com/${process.env.NEXT_PUBLIC_PAGE_ID}/published_posts?access_token=${process.env.NEXT_PUBLIC_ACCESS_TOKEN}`
+          `${process.env.NEXT_PUBLIC_API_URL}/posts`
         );
-
-        const results = [];
         console.log("posts", data);
+        const results = [];
         for (const post of data.data) {
           const insights = await getPostInsights(post.id);
 
@@ -175,7 +127,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
-      <DashboardHeader date={date} onDateChange={setDate} />
+      <DashboardHeader/>
       <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 w-full max-w-full overflow-x-hidden">
         <StatsCards stats={data} loading={isLoading} />
         <div className="grid gap-4 grid-cols-1 xl:grid-cols-7 w-full max-w-full">
