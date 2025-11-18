@@ -97,6 +97,10 @@ export default function DashboardPage() {
     const fetchPosts = async () => {
       setIsLoading(true);
       try {
+        const startDate = date?.from
+          ? formatDate(startOfMonth(new Date()))
+          : "";
+        const endDate = date?.to ? formatDate(new Date()) : "";
         const { data } = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/posts`
         );
@@ -124,6 +128,8 @@ export default function DashboardPage() {
 
     fetchPosts();
   }, []);
+
+  console.log("engagementData", engagementData);
 
   return (
     <div className="flex flex-col w-full overflow-x-hidden">

@@ -8,8 +8,8 @@ export default function DashboardHeader() {
       <div className="w-full flex-1">
         <AccountSwitcher />
       </div>
-      <div className="p-2 bg-accent text-accent-foreground text-xs italic rounded flex items-center gap-2">
-        <Info className="w-3 h-3" />
+      <div className="p-2 bg-accent text-accent-foreground/60 text-xs italic rounded flex items-center gap-2">
+        <Info className="w-3 h-3 text-accent-foreground/60" />
         <p>Channels overview for the past 30 days</p>
       </div>
     </header>
