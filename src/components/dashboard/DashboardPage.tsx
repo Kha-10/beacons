@@ -62,13 +62,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchInsights = async () => {
-      const startDate = date?.from ? formatDate(date.from) : "";
-      const endDate = date?.to ? formatDate(date.to) : "";
-
-      if (!startDate || !endDate) {
-        console.log("Dates not selected");
-        return;
-      }
       setIsLoading(true);
       try {
         const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}`);
@@ -97,14 +90,10 @@ export default function DashboardPage() {
     const fetchPosts = async () => {
       setIsLoading(true);
       try {
-        const startDate = date?.from
-          ? formatDate(startOfMonth(new Date()))
-          : "";
-        const endDate = date?.to ? formatDate(new Date()) : "";
         const { data } = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/posts`
         );
-        console.log("posts", data);
+        
         const results = [];
         for (const post of data.data) {
           const insights = await getPostInsights(post.id);
@@ -129,11 +118,9 @@ export default function DashboardPage() {
     fetchPosts();
   }, []);
 
-  console.log("engagementData", engagementData);
-
   return (
     <div className="flex flex-col w-full overflow-x-hidden">
-      <DashboardHeader/>
+      <DashboardHeader />
       <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 w-full max-w-full overflow-x-hidden">
         <StatsCards stats={data} loading={isLoading} />
         <div className="grid gap-4 grid-cols-1 xl:grid-cols-7 w-full max-w-full">
