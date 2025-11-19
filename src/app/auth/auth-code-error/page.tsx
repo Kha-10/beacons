@@ -31,7 +31,7 @@ export default function AuthCodeErrorPage() {
             <p className="text-sm text-destructive">{error}</p>
           </div>
           <Link href="/signin" className="w-full block">
-            <Button className="w-full">Try Again</Button>
+            <Button className="w-full py-6 bg-linear-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600">Try Again</Button>
           </Link>
         </CardContent>
       </Card>
