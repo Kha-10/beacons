@@ -64,7 +64,7 @@ export default function DashboardPage() {
     const fetchInsights = async () => {
       setIsLoading(true);
       try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}`);
+        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/analytics`);
         setData(data);
       } catch (error: unknown) {
         if (error instanceof Error) {
@@ -81,7 +81,7 @@ export default function DashboardPage() {
 
   async function getPostInsights(postId: string) {
     const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/posts/${postId}`
+      `${process.env.NEXT_PUBLIC_API_URL}/analytics/posts/${postId}`
     );
     return data;
   }
@@ -91,9 +91,9 @@ export default function DashboardPage() {
       setIsLoading(true);
       try {
         const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/posts`
+          `${process.env.NEXT_PUBLIC_API_URL}/analytics/posts`
         );
-        
+
         const results = [];
         for (const post of data.data) {
           const insights = await getPostInsights(post.id);
