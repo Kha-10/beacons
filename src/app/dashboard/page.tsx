@@ -12,11 +12,21 @@ const Page = async () => {
         get(name: string) {
           return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options) {
-          cookieStore.set({ name, value, ...options });
+        set(name: string, value: string, options: any) {
+          fetch(`${process.env.NEXT_PUBLIC_ORIGIN}/api/supabase-cookies`, {
+            method: "POST",
+            body: JSON.stringify({ name, value, options }),
+          });
         },
-        remove(name: string, options) {
-          cookieStore.delete({ name, ...options });
+        remove(name: string, options: any) {
+          fetch(`${process.env.NEXT_PUBLIC_ORIGIN}/api/supabase-cookies`, {
+            method: "POST",
+            body: JSON.stringify({
+              name,
+              value: "",
+              options: { ...options, maxAge: 0 },
+            }),
+          });
         },
       },
     }
