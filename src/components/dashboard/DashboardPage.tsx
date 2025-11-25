@@ -56,10 +56,6 @@ export default function DashboardPage() {
     setFollowerData(filteredFollowers);
   }, [date]);
 
-  const formatDate = (date: Date) => {
-    return date.toISOString().split("T")[0];
-  };
-
   useEffect(() => {
     const fetchInsights = async () => {
       setIsLoading(true);
