@@ -1,6 +1,7 @@
 import DashboardPage from "@/components/dashboard/DashboardPage";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const Page = async () => {
   const cookieStore = await cookies();
@@ -36,31 +37,8 @@ const Page = async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) {
-    try {
-      // Check if profile exists
-      const { data: existing } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("id", user.id)
-        .single();
-
-      // Create profile if it doesn't exist
-      if (!existing) {
-        const { error } = await supabase.from("profiles").insert({
-          id: user.id,
-          email: user.email,
-          name: user.user_metadata?.full_name || null,
-          avatar_url: user.user_metadata?.avatar_url || null,
-        });
-
-        if (error) {
-          console.error("Error creating profile:", error.message);
-        }
-      }
-    } catch (error) {
-      console.error("Profile setup error:", error);
-    }
+  if (!user) {
+    redirect("/login");
   }
 
   return <DashboardPage />;

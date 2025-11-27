@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,24 +14,9 @@ import { Loader2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 export default function SignInPage() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  //   const handleSignIn = () => {
-  //     setIsLoading(true);
-  //     // Simulate Google sign-in
-  //     setTimeout(() => {
-  //       router.push("/connect");
-  //     }, 2000);
-  //   };
-
   const handleLogin = async () => {
-    console.log("NEXT_ORIGIN:", process.env.NEXT_PUBLIC_ORIGIN);
-    console.log(
-      "Full redirect:",
-      `${process.env.NEXT_PUBLIC_ORIGIN}/auth/callback`
-    );
-
     const supabase = createClient();
 
     await supabase.auth.signInWithOAuth({
