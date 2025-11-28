@@ -41,6 +41,9 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-blob-1: var(--blob-1);
+  --color-blob-2: var(--blob-2);
+  --color-blob-3: var(--blob-3);
 }
 
 :root {
@@ -76,6 +79,9 @@
   --sidebar-accent-foreground: hsl(240 5.9% 10%);
   --sidebar-border: hsl(220 13% 91%);
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --blob-1: oklch(76.73% 0.126 359.31);
+  --blob-2: oklch(85.17% 0.0741 230.36);
+  --blob-3: oklch(90.65% 0.1094 91.23);
 }
 
 .dark {
@@ -159,5 +165,65 @@
 
   .animate-delay-10000 {
     animation-delay: 10s;
+  }
+
+  @keyframes blob-move-1 {
+
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+
+    25% {
+      transform: translate(3rem, -4rem) scale(1.1);
+    }
+
+    50% {
+      transform: translate(-2rem, 2rem) scale(0.9);
+    }
+
+    75% {
+      transform: translate(1.5rem, 3.5rem) scale(1.2);
+    }
+  }
+
+  @keyframes blob-move-2 {
+
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+
+    25% {
+      transform: translate(-3.5rem, 1.5rem) scale(0.9);
+    }
+
+    50% {
+      transform: translate(3rem, -3rem) scale(1.2);
+    }
+
+    75% {
+      transform: translate(-1.5rem, -4rem) scale(1);
+    }
+  }
+
+  @keyframes blob-move-3 {
+
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+
+    25% {
+      transform: translate(4rem, 2rem) scale(1.2);
+    }
+
+    50% {
+      transform: translate(-3rem, -3.5rem) scale(0.8);
+    }
+
+    75% {
+      transform: translate(2rem, 1.5rem) scale(1.1);
+    }
   }
 }

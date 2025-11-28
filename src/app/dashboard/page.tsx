@@ -38,9 +38,11 @@ const Page = async () => {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
+    redirect("/signin");
   }
 
+  console.log("user",user);
+  
   return <DashboardPage />;
 };
 

@@ -2,48 +2,65 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import axios from "axios";
+import { createClient } from "@/utils/supabase/client";
+import BlobLoader from "@/components/BlobLoader";
 
 export default function FacebookCallback() {
   const router = useRouter();
   const params = useSearchParams();
   const code = params.get("code");
 
+  const supabase = createClient();
+
   useEffect(() => {
-    if (!code) return;
+    async function handleFacebookCallback() {
+      if (!code) return;
 
-    // fetch(`/api/auth/facebook/exchange`, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ code }),
-    // })
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     console.log("Pages:", data.pages);
-    //     router.push("/dashboard");
-    //   })
-    //   .catch(console.error);
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Failed to get session:", error);
+        return;
+      }
 
-    const fetchPage = async () => {
+      const token = session?.access_token;
+      if (!token) {
+        console.error("No Supabase JWT found. Session:", session);
+        return;
+      }
+
       try {
         const { data } = await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/auth/facebook/callback`,
+          { code },
           {
-            code,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         console.log("pages data", data);
         router.push("/dashboard");
-        // setData(data);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.error("Error fetching Facebook pages data:", error.message);
-        }
-        // setData(null);
+      } catch (err) {
+        console.error("Callback failed:", err);
       }
-    };
+    }
 
-    fetchPage();
-  }, [code]);
+    handleFacebookCallback();
+  }, [supabase]);
 
-  return <div>Connecting your Facebook account...</div>;
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8 space-y-8">
+      <div className="relative flex items-center justify-center w-full max-w-sm">
+        <BlobLoader />
+      </div>
+      <div className="w-full max-w-sm flex flex-col items-center space-y-4">
+        <h1 className="text-xl font-medium text-foreground animate-[text-pulse_3s_ease-in-out_infinite]">
+          Connecting your Facebook account...
+        </h1>
+      </div>
+    </main>
+  );
 }
