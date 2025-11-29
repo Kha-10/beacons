@@ -5,7 +5,6 @@ import axios from "axios";
 import { createClient } from "@/utils/supabase/client";
 import BlobLoader from "@/components/BlobLoader";
 import { Button } from "@/components/ui/button";
-import { FACEBOOK_APP_ID, REDIRECT_URI, SCOPES } from "@/lib/fbData";
 
 export default function FacebookCallback() {
   const router = useRouter();
@@ -54,13 +53,6 @@ export default function FacebookCallback() {
     handleFacebookCallback();
   }, [supabase, code]);
 
-  const connectToFb = () => {
-    const oauthUrl = `https://www.facebook.com/v24.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${encodeURIComponent(
-      REDIRECT_URI
-    )}&scope=${SCOPES}&response_type=code&auth_type=rerequest`;
-    window.location.href = oauthUrl;
-  };
-
   if (!code) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8 space-y-6">
@@ -76,7 +68,7 @@ export default function FacebookCallback() {
 
         <Button
           variant="default"
-          onClick={connectToFb}
+          onClick={() => router.push("/signin")}
           className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
         >
           Try Again
