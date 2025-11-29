@@ -4,11 +4,14 @@ import { useEffect } from "react";
 import axios from "axios";
 import { createClient } from "@/utils/supabase/client";
 import BlobLoader from "@/components/BlobLoader";
+import { Button } from "@/components/ui/button";
+import { FACEBOOK_APP_ID, REDIRECT_URI, SCOPES } from "@/lib/fbData";
 
 export default function FacebookCallback() {
   const router = useRouter();
   const params = useSearchParams();
   const code = params.get("code");
+  const errorDescription = params.get("error_description");
 
   const supabase = createClient();
 
@@ -49,7 +52,38 @@ export default function FacebookCallback() {
     }
 
     handleFacebookCallback();
-  }, [supabase]);
+  }, [supabase, code]);
+
+  const connectToFb = () => {
+    const oauthUrl = `https://www.facebook.com/v24.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${encodeURIComponent(
+      REDIRECT_URI
+    )}&scope=${SCOPES}&response_type=code&auth_type=rerequest`;
+    window.location.href = oauthUrl;
+  };
+
+  if (!code) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8 space-y-6">
+        <h1 className="text-xl font-semibold text-destructive">
+          Facebook login was canceled
+        </h1>
+
+        {errorDescription && (
+          <p className="text-center text-muted-foreground max-w-sm">
+            {errorDescription.replace(/\+/g, " ")}
+          </p>
+        )}
+
+        <Button
+          variant="default"
+          onClick={connectToFb}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
+        >
+          Try Again
+        </Button>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8 space-y-8">

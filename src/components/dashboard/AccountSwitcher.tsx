@@ -2,18 +2,9 @@
 
 import Image from "next/image";
 import facebooklogo from "../../../public/facebook.png";
-
-const FACEBOOK_APP_ID = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID!;
-const REDIRECT_URI = process.env.NEXT_PUBLIC_FACEBOOK_REDIRECT_URI!;
-const SCOPES = [
-  "pages_manage_posts",
-  "pages_read_engagement",
-  "business_management",
-  "public_profile",
-].join(",");
+import { FACEBOOK_APP_ID, REDIRECT_URI, SCOPES } from "@/lib/fbData";
 
 export default function AccountSwitcher() {
-
   const handleLogin = () => {
     const oauthUrl = `https://www.facebook.com/v24.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${encodeURIComponent(
       REDIRECT_URI
