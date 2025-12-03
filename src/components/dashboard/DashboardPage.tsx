@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import type { DateRange } from "react-day-picker";
 import { startOfMonth } from "date-fns";
 import {
@@ -17,6 +17,8 @@ import ReachChart from "@/components/dashboard/ReachChart";
 import FollowerGrowthChart from "@/components/dashboard/FollowGrowth";
 import InsightsGenerator from "@/components/dashboard/InsightsGenerator";
 import axios from "axios";
+import { createClient } from "@/utils/supabase/client";
+import { FACEBOOK_APP_ID, REDIRECT_URI, SCOPES } from "@/lib/fbData";
 
 const filterDataByDateRange = (
   data: any[],
@@ -56,15 +58,51 @@ export default function DashboardPage() {
     setFollowerData(filteredFollowers);
   }, [date]);
 
+  const supabase = createClient();
+
   useEffect(() => {
     const fetchInsights = async () => {
       setIsLoading(true);
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Failed to get session:", error);
+        return;
+      }
+
+      const token = session?.access_token;
+      if (!token) {
+        console.error("No Supabase JWT found. Session:", session);
+        return;
+      }
       try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/analytics`);
+        const { data } = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/analytics`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
+        );
         setData(data);
       } catch (error: unknown) {
-        if (error instanceof Error) {
+        if (axios.isAxiosError(error)) {
+          console.error("Error fetching Facebook insights:", error);
+          const status = error.response?.status;
+
+          if (status === 401) {
+            const oauthUrl = `https://www.facebook.com/v24.0/dialog/oauth?client_id=${FACEBOOK_APP_ID}&redirect_uri=${encodeURIComponent(
+              REDIRECT_URI
+            )}&scope=${SCOPES}&response_type=code&auth_type=rerequest`;
+            window.location.href = oauthUrl;
+          }
+        } else if (error instanceof Error) {
           console.error("Error fetching Facebook insights:", error.message);
+        } else {
+          console.error("Unknown error fetching Facebook insights:", error);
         }
         setData(null);
       } finally {
@@ -73,11 +111,17 @@ export default function DashboardPage() {
     };
 
     fetchInsights();
-  }, [date]);
+  }, []);
 
-  async function getPostInsights(postId: string) {
+  async function getPostInsights(postId: string, token: string) {
     const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/analytics/posts/${postId}`
+      `${process.env.NEXT_PUBLIC_API_URL}/analytics/posts/${postId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "true",
+        },
+      }
     );
     return data;
   }
@@ -85,14 +129,35 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchPosts = async () => {
       setIsLoading(true);
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Failed to get session:", error);
+        return;
+      }
+
+      const token = session?.access_token;
+      if (!token) {
+        console.error("No Supabase JWT found. Session:", session);
+        return;
+      }
+
       try {
         const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/analytics/posts`
+          `${process.env.NEXT_PUBLIC_API_URL}/analytics/posts`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
         );
 
         const results = [];
         for (const post of data.data) {
-          const insights = await getPostInsights(post.id);
+          const insights = await getPostInsights(post.id, token);
 
           results.push({
             id: post.id,

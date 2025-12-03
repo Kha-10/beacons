@@ -40,6 +40,7 @@ export default function FacebookCallback() {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              'ngrok-skip-browser-warning': 'true'
             },
           }
         );
